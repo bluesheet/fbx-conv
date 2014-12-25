@@ -100,21 +100,23 @@ namespace readers {
 		bool uvOnPoint[8];
 
 		fbxconv::log::Log *log;
+        unsigned int segmentIndex;
 
-		FbxMeshInfo(fbxconv::log::Log *log, FbxMesh * const &mesh, const bool &usePackedColors, const unsigned int &maxVertexBlendWeightCount, const bool &forceMaxVertexBlendWeightCount, const unsigned int &maxNodePartBoneCount)
+		FbxMeshInfo(fbxconv::log::Log *log, FbxMesh * const &mesh, const bool &usePackedColors, const unsigned int &maxVertexBlendWeightCount, const bool &forceMaxVertexBlendWeightCount, const unsigned int& myPointCount,const unsigned int& myPolyCount, const FbxVector4 * myPoints, const unsigned int &maxNodePartBoneCount, unsigned int segIndex = 0)
 			: mesh(mesh), log(log),
 			usePackedColors(usePackedColors),
 			maxVertexBlendWeightCount(maxVertexBlendWeightCount), 
 			vertexBlendWeightCount(0),
 			forceMaxVertexBlendWeightCount(forceMaxVertexBlendWeightCount),
-			pointCount(mesh->GetControlPointsCount()),
-			polyCount(mesh->GetPolygonCount()),
-			points(mesh->GetControlPoints()),
-			elementMaterialCount(mesh->GetElementMaterialCount()),
+			pointCount(myPointCount/*mesh->GetControlPointsCount()*/),
+			polyCount(myPolyCount/*mesh->GetPolygonCount()*/),
+			points(myPoints/*mesh->GetControlPoints()*/),
+			elementMaterialCount(1/*mesh->GetElementMaterialCount()*/),// fix me
 			uvCount((unsigned int)(mesh->GetElementUVCount() > 8 ? 8 : mesh->GetElementUVCount())),
 			pointBlendWeights(0),
 			skin((maxNodePartBoneCount > 0 && maxVertexBlendWeightCount > 0 && (unsigned int)mesh->GetDeformerCount(FbxDeformer::eSkin) > 0) ? static_cast<FbxSkin*>(mesh->GetDeformer(0, FbxDeformer::eSkin)) : 0),
-			bonesOverflow(false),
+            segmentIndex(segIndex),
+            bonesOverflow(false),
 			polyPartMap(new  int[polyCount]),
 			polyPartBonesMap(new unsigned int[polyCount]),
 			id(getID(mesh))
