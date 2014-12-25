@@ -100,14 +100,16 @@ namespace readers {
 		bool uvOnPoint[8];
 
 		fbxconv::log::Log *log;
+        unsigned int maxPolyCount;
         unsigned int segmentIndex;
 
-		FbxMeshInfo(fbxconv::log::Log *log, FbxMesh * const &mesh, const bool &usePackedColors, const unsigned int &maxVertexBlendWeightCount, const bool &forceMaxVertexBlendWeightCount, const unsigned int& myPointCount,const unsigned int& myPolyCount, const FbxVector4 * myPoints, const unsigned int &maxNodePartBoneCount, unsigned int segIndex = 0)
+		FbxMeshInfo(fbxconv::log::Log *log, FbxMesh * const &mesh, const bool &usePackedColors, const unsigned int &maxVertexBlendWeightCount, const bool &forceMaxVertexBlendWeightCount, const unsigned int& myPointCount,const unsigned int& myPolyCount, const FbxVector4 * myPoints, const unsigned int &maxNodePartBoneCount, unsigned int myMaxPolyCount, unsigned int segIndex = 0)
 			: mesh(mesh), log(log),
 			usePackedColors(usePackedColors),
 			maxVertexBlendWeightCount(maxVertexBlendWeightCount), 
 			vertexBlendWeightCount(0),
 			forceMaxVertexBlendWeightCount(forceMaxVertexBlendWeightCount),
+            maxPolyCount(myMaxPolyCount),
 			pointCount(myPointCount/*mesh->GetControlPointsCount()*/),
 			polyCount(myPolyCount/*mesh->GetPolygonCount()*/),
 			points(myPoints/*mesh->GetControlPoints()*/),
@@ -275,6 +277,19 @@ namespace readers {
 			unsigned int offset = 0;
 			getVertex(data, offset, poly, polyIndex, point, uvTransforms);
 		}
+        
+        inline int getPolygonSize(int polyIndex)
+        {
+            int tempPolyIndex = maxPolyCount * segmentIndex + polyIndex;
+            return mesh->GetPolygonSize(tempPolyIndex);
+        }
+        
+        inline int GetPolygonVertex(int polyIndex, int positionInPolygon)
+        {
+            int tempPolyIndex = maxPolyCount * segmentIndex + polyIndex;
+            return mesh->GetPolygonVertex(tempPolyIndex, positionInPolygon);
+        }
+        
 	private:
 		static std::string getID(FbxMesh * const &mesh) {
 			static int idCounter = 0;
