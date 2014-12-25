@@ -386,11 +386,11 @@ namespace readers {
 			float *vertex = new float[mesh->vertexSize];
 			unsigned int pidx = 0;
             bool is_error = false;
-			for (unsigned int poly = 0; poly < 10922/*meshInfo->polyCount*/; poly++) {// fix me
-                int tPoly = meshInfo->segmentIndex * (settings->maxIndexCount / 3) + poly;
-				unsigned int ps = meshInfo->mesh->GetPolygonSize(tPoly);
-				int index_1 = meshInfo->polyPartMap[tPoly];// fix me
-				auto index_2 = meshInfo->polyPartBonesMap[tPoly];
+			for (unsigned int poly = 0; poly < meshInfo->polyCount; poly++) {// fix me
+         
+				unsigned int ps = meshInfo->getPolygonSize(poly);
+				int index_1 = meshInfo->polyPartMap[poly];// fix me
+				auto index_2 = meshInfo->polyPartBonesMap[poly];
 				if(index_1 >= 0 && index_2 >= 0 )
 				{
 				MeshPart * const &part = parts[index_1][index_2];
@@ -399,9 +399,9 @@ namespace readers {
 					for (unsigned int i = 0; i < ps; i++) {
                         
                         
-						const unsigned int v = meshInfo->mesh->GetPolygonVertex(tPoly, i);
+						const unsigned int v = meshInfo->getPolygonVertex(poly, i);
                         
-						meshInfo->getVertex(vertex, tPoly, pidx, v, uvTransforms);
+						meshInfo->getVertex(vertex, poly, pidx, v, uvTransforms);
 						part->indices.push_back(mesh->add(vertex));
 						pidx++;
 					}
@@ -552,15 +552,18 @@ namespace readers {
 						continue;
 					}
                     
-                    if( indexCount > settings->maxIndexCount )
+					int maxPolyCount = settings->maxIndexCount / 3;
+                    if(indexCount > settings->maxIndexCount)
                     {
-                        int meshCount = indexCount / settings->maxIndexCount;// fix me
-                        for(int meshIndex = 0; meshIndex < meshCount; meshIndex++)
+                        int meshSegmentCount = indexCount / settings->maxIndexCount;// fix me
+						int remainIndices = indexCount % settings->maxIndexCount;
+						if(remainIndices != 0)
+							++meshSegmentCount;
+					
+                        for(int meshIndex = 0; meshIndex < meshSegmentCount; meshIndex++)
                         {
-                            //int polyCount = settings->maxIndexCount / 3;
                             //FbxVector4 * points = mesh->GetControlPoints() + meshIndex * settings->maxIndexCount;
-                            //FbxMeshInfo * const info = new FbxMeshInfo(log, mesh, settings->packColors, settings->maxVertexBonesCount, settings->forceMaxVertexBoneCount, settings->maxIndexCount, polyCount, points, settings->maxNodePartBonesCount, meshIndex);
-                            FbxMeshInfo * const info = new FbxMeshInfo(log, mesh, settings->packColors, settings->maxVertexBonesCount, settings->forceMaxVertexBoneCount, mesh->GetControlPointsCount(), mesh->GetPolygonCount(), mesh->GetControlPoints(), settings->maxNodePartBonesCount, meshIndex);
+                            FbxMeshInfo * const info = new FbxMeshInfo(log, mesh, settings->packColors, settings->maxVertexBonesCount, settings->forceMaxVertexBoneCount, maxPolyCount, settings->maxNodePartBonesCount, meshIndex);
                             meshInfos.push_back(info);
                             //fbxMeshMap[mesh] = info;
                             fbxMeshMap[mesh].push_back(info);
@@ -570,7 +573,7 @@ namespace readers {
                     }
                     else
                     {
-                        FbxMeshInfo * const info = new FbxMeshInfo(log, mesh, settings->packColors, settings->maxVertexBonesCount, settings->forceMaxVertexBoneCount, mesh->GetControlPointsCount(), mesh->GetPolygonCount(), mesh->GetControlPoints(), settings->maxNodePartBonesCount, 0);
+                        FbxMeshInfo * const info = new FbxMeshInfo(log, mesh, settings->packColors, settings->maxVertexBonesCount, settings->forceMaxVertexBoneCount, maxPolyCount, settings->maxNodePartBonesCount, 0);
                         meshInfos.push_back(info);
                         //fbxMeshMap[mesh] = info;
                         fbxMeshMap[mesh].push_back(info);
