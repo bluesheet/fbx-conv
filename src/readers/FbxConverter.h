@@ -865,7 +865,7 @@ namespace readers {
                 if(frames.size() == 0)
                     continue;
 
-                float length = animStop;
+                float length = frames[frames.size() - 1]->time;
                 animation->length = length / 1000.f;
 
 				// Only add keyframes really needed
