@@ -183,16 +183,15 @@ namespace modeldata {
             v1.type = "GL_FLOAT";
             attributemap["VERTEX_ATTRIB_COLOR"]= v1;
 
-
-           /* v1.name = "TANGENT";
+            v1.name = "VERTEX_ATTRIB_TANGENT";
             v1.size = 3;
             v1.type = "GL_FLOAT";
             attributemap["TANGENT"]= v1;   
 
-            v1.name = "BINORMAL";
+            v1.name = "VERTEX_ATTRIB_BINORMAL";
             v1.size = 3;
             v1.type = "GL_FLOAT";
-            attributemap["BINORMAL"]= v1;*/
+            attributemap["BINORMAL"]= v1;
 
         }
 

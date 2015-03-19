@@ -49,7 +49,7 @@ struct FbxConvCommand {
         settings->needReusableMesh = true;
         settings->normalizeVertexNormal = false;
         settings->exportPart = EXPORT_PART_ALL;
-        settings->normalMap = false;
+        settings->normalMap = true;
         settings->compressLevel = COMPRESS_LEVEL_DEFAULT;
             
 		for (int i = 1; i < argc; i++) {
@@ -140,6 +140,7 @@ struct FbxConvCommand {
         printf("-c <size>: The compression level: 0 , 1 (default: 0)\n");
         printf("-l       : Export model data only.\n");
         printf("-j       : Export animation data only.\n");
+        printf("-p       : Export tagent binormal data.\n");
         printf("\n");
         printf("<input>  : The filename of the file to convert.\n");
         //printf("<output> : The filename of the converted file.\n");
