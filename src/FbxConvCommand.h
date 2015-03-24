@@ -49,7 +49,7 @@ struct FbxConvCommand {
         settings->needReusableMesh = true;
         settings->normalizeVertexNormal = false;
         settings->exportPart = EXPORT_PART_ALL;
-        settings->normalMap = true;
+        settings->normalMap = false;
         settings->compressLevel = COMPRESS_LEVEL_DEFAULT;
             
 		for (int i = 1; i < argc; i++) {
