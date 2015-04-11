@@ -754,6 +754,9 @@ namespace readers {
 				animStop = 999999999.0f;
             
             //
+            float animRealyLengh = 0.f;
+            
+            //
             static std::map<FbxNode *, std::list<float> > keyframesTimeMap;
             
 			// Could also use animStack->GetLocalTimeSpan and animStack->BakeLayers, but its not guaranteed to be correct
@@ -827,9 +830,6 @@ namespace readers {
                                 }
                             }
                             
-							//if (ts.start < ts.stop)
-								affectedNodes[node] += ts;
-                            
                             if(settings->compressLevel >= COMPRESS_LEVEL_1)
                             {
                                 if(!find)
@@ -837,6 +837,12 @@ namespace readers {
                                 
                                 keyframesTimeMap[node].sort();
                             }
+                            
+                            if(animRealyLengh < ts.stop)
+                                animRealyLengh = ts.stop;
+                            
+							//if (ts.start < ts.stop)
+								affectedNodes[node] += ts;
 						}
 					}
 				}
@@ -846,9 +852,11 @@ namespace readers {
 				return;
 
 			Animation *animation = new Animation();
+            animation->length = animRealyLengh / 1000.f;
+            animation->id = animStack->GetName();
+            animStack->GetScene()->SetCurrentAnimationStack(animStack);
 			model->animations.push_back(animation);
-			animation->id = animStack->GetName();
-			animStack->GetScene()->SetCurrentAnimationStack(animStack);
+			
             
 			// Add the NodeAnimations to the Animation
 			for (std::map<FbxNode *, AnimInfo>::const_iterator itr = affectedNodes.begin(); itr != affectedNodes.end(); itr++) {
@@ -922,13 +930,13 @@ namespace readers {
                 if(frames.size() == 0)
                     continue;
 
-                float length = frames[frames.size()-1]->time ;
-                float lengthSec = length / 1000.f;
-                if(lengthSec > animation->length)
-                    animation->length = lengthSec;
+//                float length = frames[frames.size()-1]->time ;
+//                float lengthSec = length / 1000.f;
+//                if(lengthSec > animation->length)
+//                    animation->length = lengthSec;
 
 				// Only add keyframes really needed
-                addKeyframes(nodeAnim, frames, length);
+                addKeyframes(nodeAnim, frames, animRealyLengh);
 				if (nodeAnim->rotate || nodeAnim->scale || nodeAnim->translate)
 					animation->nodeAnimations.push_back(nodeAnim);
 				else
